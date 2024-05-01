@@ -1,0 +1,22 @@
+{
+    "Majors": {
+        "csci" : {
+            "specific": ["CSCI1101", "CSCI1102", "CSCI2243", "CSCI2271", "CSCI2272", "CSCI2244", "CSCI3383", "MATH1103"],
+            "additional": ["1.2", "3.3"]
+        },
+        "math" : {
+            "specific": ["MATH1102", "MATH1103", "MATH2202", "MATH2210", "MATH2216", "MATH3310", "MATH3320"],
+            "additional": ["6.4"]
+        }
+    },
+    "Minors": {
+        "csci" : {
+            "specific":["CSCI1101", "CSCI1102", "CSCI2243", "CSCI2271"],
+            "additional": ["2.2", "2.3"]
+        },
+        "math" : {
+            "specific":["MATH2202", "MATH2210", "MATH2216", "MATH3310", "MATH3321"],
+            "additional": ["2.4"]
+        }
+    }
+}

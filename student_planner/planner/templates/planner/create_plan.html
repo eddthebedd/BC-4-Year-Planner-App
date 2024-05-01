@@ -1,0 +1,152 @@
+{% load static %}
+{% load my_filters %}
+{% load django_bootstrap5 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boston College Student Planner</title>
+    <link rel="stylesheet" href="{% static 'css/landing_student.css' %}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <style>
+      .grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 20px; 
+      }
+      .card {
+    min-height: 360px;
+    border: 1px solid #ccc;  /* Add a border */
+    border-radius: 10px;  /* Round the corners */
+    padding: 20px;  /* Add some padding */
+    box-shadow: 2px 2px 6px 0px  rgba(0,0,0,0.20);  /* Add a shadow */
+    }
+    .card h2 {
+    margin: 16px 0 0 0;
+    background-color: white;
+    padding: 10px;  /* Add some padding */
+    text-align: center;  /* Center the text */
+    }
+    .card div {
+    padding: 10px;
+    margin: 10px;
+    background-color: rgba(211, 211, 211, 0.5);
+    border-radius: 5px;
+    }
+    .card p {
+    margin: 0px;
+    text-align: center;  /* Center the text */
+    }
+    </style>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-container">
+        <a href="{% url 'landing_student' %}">
+          <img src="{% static 'assets/logo.png' %}" alt="Boston College Logo" class="navbar-logo">
+        </a>
+        <div class="header-content">
+            <h1 class="logo">BC Student Planner</h1>
+            <div class="main-nav">
+            <ul>
+              <li><a href="{% url 'account' %}">My Profile</a></li>
+              {% if request.user.role == 'STUDENT'%}
+                <li><a href={% url 'create_plan' %}>My 4-Year Plan</a></li>
+              {% endif %}
+              {% if request.user.role == 'ADVISOR' %}
+                <li><a href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+              {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <section class="features">
+        {% for planner in planners %}
+          <div class="container">
+            <h1>{{ planner.name }}</h1>
+            <div class="grid-container">
+            {% for semester_name, semester in planner.semesters %}
+            <a href="/plan-semester/{{semester.pk}}">
+                <div class="card" style="min-height:360px;">
+                  <h2 style="margin: 16 0 0 0; background-color: white">{{ semester_name|replace_underscore|title }}</h2>
+                  <hr>
+                    <div style="height: 100% !important;">
+                    {% if semester %}
+                        {% for course in semester.courses.all %}
+                        <div style="padding: 10px; margin: 10px; background-color: rgba(211, 211, 211, 0.5); border-radius: 5px">
+                            <p style="margin: 0px">{{ course }}</p>
+                        </div>
+                        {% endfor %}
+                        {{ semester.credit_hours }} credit hours
+                    {% else %}
+                    {% endif %}
+                </div>
+                </div>
+              </a>
+            {% endfor %}
+            </div>
+            <div style="width: 100%; overflow: visible;">
+              <svg width="100%" height="30" style="margin: 5px">
+                  <rect width="100%" height="20" style="stroke: maroon; fill: #ddd;" rx="10" />
+                  <rect id='progress{{forloop.counter}}' width="50%" height="20" style="fill: maroon;" rx="10" />
+              </svg>
+              <div style="height: 30px">
+                <p style="float: left; margin-left: 5px;">Progress: {{ planner.progress_perc }}%</p>
+                <p style="float: right; margin-right: 5px;">Credits: {{ planner.progress_value }}</p>
+              </div>
+            </div>
+            <div style='padding: 10px'></div>
+            <div>
+              {% for key, value in planner.major_validation.items %}
+                <h1>{{ key }}</h1>
+                  {% for req, courses in value.items%}
+                      <p>
+                        <span>{{ req }}: </span>
+                        {% if forloop.first %}
+                          {% for course in courses %}
+                            <span>
+                              {{ course }}{% if not forloop.last %}, {% endif %}
+                            </span>
+                          {% endfor %}
+                        {% else %}
+                          {% for level, num in courses.items %}
+                            <span> 
+                              {{ level }} &mdash; {{ num }}{% if not forloop.last %}, {% endif %}
+                            </span>
+                          {% endfor %}
+                        {% endif %}
+                      </p>
+                  {% endfor %}
+              {% endfor %}
+            </div>
+            <div style='padding: 10px'></div>
+
+        </div>
+        {% endfor %}
+      </section>
+      <div style='padding: 10px'></div>
+      <div class='container'>
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit">Create Planner</button>
+        </form>
+      </div>
+    <script>
+      var progresses = document.querySelectorAll('[id^="progress"]');
+     
+      var progressData = {{ progress_data|safe }};
+    
+      progresses.forEach(function(progress) {
+          // Use the data in JavaScript
+          var width = progressData[progress.id] / 120 * 100;
+          progress.style.width = width + '%';
+      });
+    </script>
+</body>
+</html>

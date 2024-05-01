@@ -1,0 +1,89 @@
+{% load static %}
+{% load allauth i18n %}
+{% load widget_tweaks %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% load static %}
+{% load i18n %}
+{% load account %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/landing_student.css' %}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-container">
+        <a href="{% url 'landing_student' %}">
+            <img src="{% static 'assets/logo.png' %}" alt="Boston College Logo" class="navbar-logo">
+        </a>
+        <div class="header-content">
+            <h1 class="logo">BC Student Planner</h1>
+            <div class="main-nav">
+            <ul>
+                <li><a href="{% url 'account' %}">My Profile</a></li>
+                {% if request.user.role == 'STUDENT'%}
+                  <li><a href={% url 'create_plan' %}>My 4-Year Plan</a></li>
+                {% endif %}
+                {% if request.user.role == 'ADVISOR' %}
+                  <li><a href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+                {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </header>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6"> <!-- Adjusted column width for better layout -->
+                <div class="card">
+                    <div class="card-body p-5">
+                        <form method="post" class="needs-validation was-validated" novalidate>
+                            {% csrf_token %}
+                            {% for field in form %}
+                            <div class="form-group">
+                                {{ field.label_tag }}
+                                {% if field.field.required %}
+                                <span class="required">*</span>
+                                {% endif %}
+                                {{ field|add_class:"form-control" }}
+                                {% if field.errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {% for error in field.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                {% if field.help_text %}
+                                <small id="{{ field.auto_id }}_helptext" class="form-text text-muted">
+                                    {{ field.help_text|safe }}
+                                </small>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            <button type="submit" class="btn btn-danger">Submit</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5>{% trans "Sign Out" %}</h5>
+                        <p>{% trans 'Are you sure you want to sign out?' %}</p>
+                        <form method="post" action="{% url 'account_logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">{% trans 'Sign Out' %}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

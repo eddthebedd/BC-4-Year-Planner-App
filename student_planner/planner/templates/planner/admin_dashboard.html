@@ -1,0 +1,73 @@
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/landing_student.css' %}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <style>
+        .card-body {
+            text-align: center; /* Centers the text in the card body */
+        }
+        .card-title,
+        .card-text {
+            margin-bottom: 0.5rem; /* Adds spacing between title and text */
+        }
+        .btn {
+            display: block; /* Sets the button to block to take full width */
+            margin: 0.5rem auto; /* Centers the button */
+        }
+        /* Add any additional styles here */
+    </style>
+</head>
+  <body>
+    <header class="main-header">
+      <div class="header-container">
+        <a href="{% url 'landing_student' %}">
+          <img src="{% static 'assets/logo.png' %}" alt="Boston College Logo" class="navbar-logo">
+        </a>
+        <div class="header-content">
+            <h1 class="logo">BC Student Planner</h1>
+            <div class="main-nav">
+            <ul>
+              <li><a href="{% url 'account' %}">My Profile</a></li>
+              {% if request.user.role == 'STUDENT'%}
+                <li><a href={% url 'create_plan' %}>My 4-Year Plan</a></li>
+              {% endif %}
+              {% if request.user.role == 'ADVISOR' %}
+                <li><a href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+              {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <h1>Assigned Students: </h1>
+      <div class="container">
+          <div class="row">
+            {% for student in students %}
+              <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ student.first_name }} {{ student.last_name }}</h5>
+                        <p class="card-text">Class of 2025</p>
+                        <p class="card-text">Major: CSCI</p>
+                        <p class="card-text">Minor: MATH</p>
+                        <a href="{% url 'student_detail' student.eagle_id %}" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+      </div>
+    </main>
+
+  </body>
+</html>

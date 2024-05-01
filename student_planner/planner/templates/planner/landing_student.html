@@ -1,0 +1,133 @@
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boston College Student Planner</title>
+    <link rel="stylesheet" href="{% static 'css/landing_student.css' %}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-container">
+        <a href="{% url 'landing_student' %}">
+          <img src="{% static 'assets/logo.png' %}" alt="Boston College Logo" class="navbar-logo">
+        </a>
+        <div class="header-content">
+            <h1 class="logo">BC Student Planner</h1>
+            <div class="main-nav">
+            <ul>
+              <li><a href="{% url 'account' %}">My Profile</a></li>
+              {% if request.user.role == 'STUDENT'%}
+                <li><a href={% url 'create_plan' %}>My 4-Year Plan</a></li>
+              {% endif %}
+              {% if request.user.role == 'ADVISOR' %}
+                <li><a href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+              {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div class="container">
+          <div style="width: 100%; overflow: visible;">
+            <svg width="100%" height="30" style="margin: 5px">
+                <rect width="100%" height="20" style="stroke: maroon; fill: #ddd;" rx="10" />
+                <rect id='progress' width="50%" height="20" style="fill: maroon;" rx="10" />
+            </svg>
+            <div style="height: 30px">
+              <p style="float: left; margin-left: 5px;">Progress: {{ progress_width }}%</p>
+              <p style="float: right; margin-right: 5px;">Credits: {{ num_creds }}</p>
+            </div>
+          </div>
+          <h2>Welcome to Your Academic Planning Tool</h2>
+          <p>
+            Plan your four years at Boston College with ease. Start crafting
+            your future today.
+          </p>
+          {% if planners %}
+          <p>View your planners!</p>
+          <a href={% url 'create_plan' %} class="btn btn-primary">Start Planning</a>
+          {% endif %}
+          {% if not planners %}
+          <p>You don't have a planner yet!</p>
+          <a href="{% url 'create_plan' %}" class="btn btn-primary start-planning">Start Planning</a>
+          {% endif %}
+          
+        </div>
+      </section>
+
+      <section class="features">
+        <div class="container">
+          <h3>Enrolled Classes</h3>
+          <ul class="class-list">
+            {% for course in enrolled_courses %}
+            <li>
+              <strong>Title:</strong> {{ course.class_name }}<br />
+              <strong>Professor:</strong> {{ course.class_professor }}<br />
+              <strong>Date & Time:</strong> {{ course.class_days }}, {{
+              course.class_time }}<br />
+              <strong>Location:</strong> {{ course.class_location }}
+            </li>
+            {% empty %}
+            <li>You are not enrolled in any courses yet.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+      {% for course in data %}
+      <h3>{{course.course.courseCode}} {{ course.course.title }}</h3>
+      <ul class="class-list">
+        <li>
+          <strong>Title:</strong> {{ course.course.title }}<br />
+          <strong>Subject:</strong> {{ course.subjectArea.longName }}<br />
+          <strong>Description:</strong> {{ course.course.descr.formatted|safe }}<br />
+          <strong>Prereqs:</strong> {% for prereq in course.prereqTerseTranslations %}
+          {{ prereq.descr.plain }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
+        </li>
+      </ul>
+      {% endfor %}
+      <pre id="json"></pre>
+    </main>
+    {% if messages %}
+    <div aria-live="polite" aria-atomic="true" class="m-3" style="position: absolute;top:0;right:0;min-height: 200px">
+          {% for message in messages %}
+          <div class="toast alert text-white" 
+                style="display: flex; align-items: center; justify-content: space-between; background-color: #BB2D38;"
+                role="alert" aria-live="assertive" aria-atomic="true" data-delay="4000" data-autohide="false">
+                {{message|safe}}
+              <button type="button" class="btn-close" 
+              data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+    </div>
+    <script>
+        $(document).ready(function(){
+            $('.toast').toast('show');
+        });
+        $('.close').click(function(){
+            $('.toast').toast('hide');
+        });
+    </script>
+    {% endif %}
+    <script>
+      var data = {{ data_dict|safe }};
+      document.getElementById("json").textContent = JSON.stringify(data, null, 2);
+    </script>
+    <script>
+      var progress = document.getElementById('progress');
+      var width = {{ progress_width|safe }};
+      progress.style.width = width + '%';
+    </script>
+  </body>
+</html>
+
+
+

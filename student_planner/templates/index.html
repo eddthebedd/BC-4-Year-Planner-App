@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+{% load socialaccount %}
+{% load allauth i18n %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<html lang="en">
+<head>
+    <script src="https://kit.fontawesome.com/fbb407c172.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <style>
+        body {
+          height: 100vh;
+          background: linear-gradient(to bottom, #800000 calc(100vh / 2.5), #ffffff 0%);
+          background-repeat: no-repeat;
+        }
+        .container {
+            margin-top: 20vh; /* Adjust this value to move the card down */
+          }
+      </style>
+</head>
+<body>
+    <div class="container" style="position: absolute; top: 0; left: 50%; transform: translate(-50%, 0%);">
+        <div class="row justify-content-center w-100">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body p-5">
+                        <img src="https://login.bc.edu/nidp/images/assets/image/logo-alt2.png" 
+                            class="img-fluid mb-5" 
+                            alt="Boston College Logo"/>
+                            {% if user.is_authenticated %}
+                        <p>Welcome {{ user.first_name }} {{ user.last_name }} !!!</p>
+                        {% block content_auth_form %}
+                            <form method="post" action="{% url 'account_logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-lg btn-danger">{% translate "Log out" %}</button>
+                            </form>
+                        {% endblock content_auth_form %}
+                        {% else %}
+                            <div class="text-center mt-5">
+                                <a href='{% provider_login_url "google" %}' class="btn btn-lg btn-danger">
+                                    <i class="fab fa-google m-2"></i> 
+                                    <text>Sign in with Google</text>
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if messages %}
+    <div aria-live="polite" aria-atomic="true" class="m-3" style="position: absolute;top:0;right:0; min-height: 200px">
+          {% for message in messages %}
+          <div class="toast alert text-white" 
+                style="display: flex; align-items: center; justify-content: space-between; background-color: #BB2D38;"
+                role="alert" aria-live="assertive" aria-atomic="true" data-delay="4000" data-autohide="false">
+                {{message|safe}}
+              <button type="button" class="btn-close" 
+              data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+    </div>
+    <script>
+        $(document).ready(function(){
+            $('.toast').toast('show');
+        });
+        $('.close').click(function(){
+            $('.toast').toast('hide');
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

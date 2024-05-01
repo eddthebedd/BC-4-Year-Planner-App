@@ -1,0 +1,82 @@
+{% load static %}
+{% load allauth i18n %}
+{% load widget_tweaks %}
+{% load my_filters %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% load static %}
+{% load i18n %}
+{% load account %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/landing_student.css' %}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="header-container">
+        <a href="{% url 'landing_student' %}">
+            <img src="{% static 'assets/logo.png' %}" alt="Boston College Logo" class="navbar-logo">
+        </a>
+        <div class="header-content">
+            <h1 class="logo">BC Student Planner</h1>
+            <div class="main-nav">
+            <ul>
+                <li><a href="{% url 'account' %}">My Profile</a></li>
+                {% if request.user.role == 'STUDENT'%}
+                  <li><a href={% url 'create_plan' %}>My 4-Year Plan</a></li>
+                {% endif %}
+                {% if request.user.role == 'ADVISOR' %}
+                  <li><a href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+                {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </header>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6"> <!-- Adjusted column width for better layout -->
+                <div class="card">
+                    <div class="card-body p-5">
+                        <h2>Student Information</h2>
+                        <p><strong>Name:</strong> {{ student.first_name }} {{student.last_name}}</p>
+                        <p><strong>Email:</strong> {{ student.email }}</p>
+                        <p><strong>Major One:</strong> {{ student.major_one }}</p>
+                        <p><strong>Major Two:</strong> {{ student.major_two }}</p>
+                        <p><strong>Minor One:</strong> {{ student.minor_one }}</p>
+                        <p><strong>Major one:</strong> {{ student.major_one }}</p>
+                        <p><strong>Class Year:</strong> {{ student.class_year }}</p>
+                        <p><strong>College:</strong> {{ student.college }}</p>
+                        </hr>
+                        <h2>Student Planners</h2>
+                        <ul>
+                            {% for planner in planners %}
+                                <h1>{{ planner.name }}</h1>
+                                <div class="row">
+                                  {% for semester_name, semester in planner.semesters %}
+                                      <div class="col-6">
+                                        <a href="{% url 'detail' semester.pk %}?next={{ request.path|urlencode }}">
+                                          <strong>{{ semester_name|replace_underscore|title }}</strong>
+                                        </a>
+                                      </div>
+                                      {% if forloop.counter|divisibleby:2 %}
+                                          </div><div class="row">
+                                      {% endif %}
+                                  {% endfor %}
+                              </div>
+                            {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
