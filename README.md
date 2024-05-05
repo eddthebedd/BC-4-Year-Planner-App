@@ -1,6 +1,6 @@
 # BC 4 Year Planner
 
-The BC 4 Year Planner is an academic planning application made for Boston College by Django-Unchained to assist first year students in exploring potential major/minor courses and plan out different schedules for their 4 year academic tenure. 
+The BC 4 Year Planner is an academic planning application made for Boston College by Django-Unchained to assist first year students in exploring potential major/minor courses and plan out different schedules for their 4 year academic tenure. To see all commits, visit https://github.com/CSCI3356-Spring2024/Django-Unchained
 
 ## Commands
 
